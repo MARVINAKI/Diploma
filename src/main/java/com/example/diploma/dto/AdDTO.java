@@ -3,7 +3,7 @@ package com.example.diploma.dto;
 import lombok.Data;
 
 @Data
-public class Ad {
+public class AdDTO {
 
 	private Integer author;
 	private String image;

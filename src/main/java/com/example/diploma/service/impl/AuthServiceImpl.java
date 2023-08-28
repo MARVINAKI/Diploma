@@ -1,45 +1,35 @@
 package com.example.diploma.service.impl;
 
 import com.example.diploma.dto.Register;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.example.diploma.model.User;
+import com.example.diploma.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import com.example.diploma.service.AuthService;
 
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-	private final UserDetailsManager manager;
+	private final UserService userService;
 	private final PasswordEncoder encoder;
 
-	public AuthServiceImpl(UserDetailsManager manager,
-						   PasswordEncoder passwordEncoder) {
-		this.manager = manager;
-		this.encoder = passwordEncoder;
-	}
-
 	@Override
-	public boolean login(String userName, String password) {
-		if (!manager.userExists(userName)) {
+	public boolean login(String username, String password) {
+		if (!userService.userExists(username)) {
 			return false;
 		}
-		UserDetails userDetails = manager.loadUserByUsername(userName);
-		return encoder.matches(password, userDetails.getPassword());
+		return encoder.matches(password, userService.getUser(username).getPassword());
 	}
 
 	@Override
 	public boolean register(Register register) {
-		if (manager.userExists(register.getUsername())) {
+		if (userService.userExists(register.getUsername())) {
 			return false;
 		}
-		manager.createUser(
-				User.builder()
-						.passwordEncoder(this.encoder::encode)
-						.password(register.getPassword())
-						.username(register.getUsername())
-						.roles(register.getRole().name())
-						.build());
+		User user = User.convertRegisterToUser(register);
+		user.setPassword(encoder.encode(register.getPassword()));
+		userService.createUser(user);
 		return true;
 	}
 }

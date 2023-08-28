@@ -2,9 +2,7 @@ package com.example.diploma.controller;
 
 import com.example.diploma.dto.NewPassword;
 import com.example.diploma.dto.UpdateUser;
-import com.example.diploma.dto.User;
-import com.example.diploma.service.NewPasswordService;
-import com.example.diploma.service.UpdateUserService;
+import com.example.diploma.dto.UserDTO;
 import com.example.diploma.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,27 +17,25 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
 	private final UserService userService;
-	private final NewPasswordService newPasswordService;
-	private final UpdateUserService updateUserService;
 
 	@GetMapping("/me")
-	public ResponseEntity<User> findInfoAboutAuthorizedUser() {
-		Integer userIdForService = 1;
-		return ResponseEntity.ok().body(new User());
+	public ResponseEntity<UserDTO> findInfoAboutAuthorizedUser() {
+		return ResponseEntity.ok().body(userService.getAuthorizedUser());
 	}
 
 	@PostMapping("/set_password")
 	public ResponseEntity<Boolean> updateUserPassword(@RequestBody NewPassword newPassword) {
-		return ResponseEntity.ok().body(false);
+		return ResponseEntity.ok().body(userService.updatePassword(newPassword));
 	}
 
 	@PatchMapping("/me")
 	public ResponseEntity<UpdateUser> updateInfoAboutAuthorizedUser(@RequestBody UpdateUser updateUser) {
-		return ResponseEntity.ok().body(updateUser);
+		UpdateUser updateUserResponse = userService.updateUserInfo(updateUser);
+		return updateUserResponse != null ? ResponseEntity.ok(updateUserResponse) : ResponseEntity.badRequest().build();
 	}
 
 	@PatchMapping("/me/image")
-	public ResponseEntity<String> updateImageAuthorizedUser(@RequestBody String image) {
-		return ResponseEntity.ok().body(image);
+	public ResponseEntity<Boolean> updateImageAuthorizedUser(@RequestBody String image) {
+		return ResponseEntity.ok().body(userService.updateImage(image));
 	}
 }

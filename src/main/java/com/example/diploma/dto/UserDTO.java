@@ -2,8 +2,10 @@ package com.example.diploma.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
-public class User {
+public class UserDTO {
 
 	private Integer id;
 	private String email;
@@ -12,4 +14,7 @@ public class User {
 	private String phone;
 	private String role;
 	private String image;
+	private LocalDateTime registrationDate;
+	private Integer numberOfComments;
+	private Integer numberOfAds;
 }

@@ -1,5 +1,6 @@
 package com.example.diploma.dto;
 
+import com.example.diploma.constant.Role;
 import lombok.Data;
 
 @Data
