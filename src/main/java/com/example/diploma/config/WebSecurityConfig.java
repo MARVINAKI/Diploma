@@ -18,20 +18,22 @@ public class WebSecurityConfig {
 			"/v3/api-docs",
 			"/webjars/**",
 			"/login",
-			"/register"
+			"/register",
+			"/ads"
 	};
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.csrf()
+		http
+				.csrf()
 				.disable()
 				.authorizeHttpRequests(
 						authorization ->
 								authorization
 										.mvcMatchers(AUTH_WHITELIST)
 										.permitAll()
-//                                        .mvcMatchers("/ads/**", "/users/**")
-//                                        .authenticated()
+										.mvcMatchers("/ads/**", "/users/**")
+										.authenticated()
 				)
 				.cors()
 				.and()

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,7 @@ public class CommentServiceImpl implements CommentService {
 	private final UserRepository userRepository;
 
 	@Override
+	@Transactional
 	public Comments findAllCommentsOfAd(Integer id) {
 		List<CommentDTO> commentDTOList = commentRepository.findAll().stream()
 				.filter(comment -> comment.getAd().getId().equals(id))
@@ -37,6 +39,7 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
+	@Transactional
 	public CommentDTO createCommentByAd(Integer id, CreateOrUpdateComment createOrUpdateComment) {
 		CommentDTO commentDTO = new CommentDTO();
 		String username = getUsernameOfAuthorizedUser();
@@ -51,6 +54,7 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
+	@Transactional
 	public CommentDTO updateCommentOfAd(Integer adId, Integer commentId, CreateOrUpdateComment createOrUpdateComment) {
 		CommentDTO commentDTO = new CommentDTO();
 		Optional<Comment> comment = commentRepository.findCommentByIdAndAd_Id(commentId, adId);
@@ -63,6 +67,7 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
+	@Transactional
 	public boolean deleteComment(Integer adId, Integer commentId) {
 		Optional<Comment> comment = commentRepository.findCommentByIdAndAd_Id(commentId, adId);
 		if (comment.isPresent()) {

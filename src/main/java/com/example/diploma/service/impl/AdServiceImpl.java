@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,12 +26,14 @@ public class AdServiceImpl implements AdService {
 	private final UserRepository userRepository;
 
 	@Override
+	@Transactional
 	public Ads getAllAds() {
 		List<AdDTO> adDTOList = adRepository.findAll().stream().map(Ad::convertAdToAdDTO).collect(Collectors.toList());
 		return Ads.convertListToAds(adDTOList);
 	}
 
 	@Override
+	@Transactional
 	public Ads getAllAuthorsAds() {
 		String username = getUsernameOfAuthorizedUser();
 		User author = userRepository.findUserByUsername(username).orElseThrow();
@@ -39,11 +42,13 @@ public class AdServiceImpl implements AdService {
 	}
 
 	@Override
+	@Transactional
 	public Optional<Ad> getAd(Integer id) {
 		return adRepository.findById(id);
 	}
 
 	@Override
+	@Transactional
 	public AdDTO createNewAd(AdDTO adDTO) {
 		AdDTO adDTOResponse = new AdDTO();
 		String username = getUsernameOfAuthorizedUser();
@@ -57,6 +62,7 @@ public class AdServiceImpl implements AdService {
 	}
 
 	@Override
+	@Transactional
 	public AdDTO updateAd(Integer id, CreateOrUpdateAd createOrUpdateAd) {
 		AdDTO adDTOResponse = new AdDTO();
 		Optional<Ad> ad = adRepository.findById(id);
@@ -69,6 +75,7 @@ public class AdServiceImpl implements AdService {
 	}
 
 	@Override
+	@Transactional
 	public boolean updateImage(Integer id, String image) {
 		Optional<Ad> ad = adRepository.findById(id);
 		if (ad.isPresent()) {
@@ -80,6 +87,7 @@ public class AdServiceImpl implements AdService {
 	}
 
 	@Override
+	@Transactional
 	public boolean deleteAd(Integer id) {
 		Optional<Ad> ad = adRepository.findById(id);
 		if (ad.isPresent()) {

@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -22,21 +23,25 @@ public class UserServiceImpl implements UserService {
 	private final PasswordEncoder encoder;
 
 	@Override
+	@Transactional
 	public void createUser(User user) {
 		userRepository.save(user);
 	}
 
 	@Override
+	@Transactional
 	public boolean userExists(String username) {
 		return userRepository.findUserByUsername(username).isPresent();
 	}
 
 	@Override
+	@Transactional
 	public User getUser(String username) {
 		return userRepository.findUserByUsername(username).orElseThrow();
 	}
 
 	@Override
+	@Transactional
 	public UserDTO getAuthorizedUser() {
 		String username = getUsernameOfAuthorizedUser();
 		User user = userRepository.findUserByUsername(username).orElseThrow();
@@ -44,6 +49,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional
 	public boolean updatePassword(NewPassword newPassword) {
 		String username = getUsernameOfAuthorizedUser();
 		User user = userRepository.findUserByUsername(username).orElseThrow();
@@ -55,6 +61,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional
 	public UpdateUser updateUserInfo(UpdateUser updateUser) {
 		UpdateUser updateUserResponse = new UpdateUser();
 		String username = getUsernameOfAuthorizedUser();
@@ -67,6 +74,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional
 	public boolean updateImage(String image) {
 		String username = getUsernameOfAuthorizedUser();
 		Optional<User> user = userRepository.findUserByUsername(username);

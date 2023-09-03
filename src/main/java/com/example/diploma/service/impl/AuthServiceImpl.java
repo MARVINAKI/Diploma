@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.example.diploma.service.AuthService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +16,7 @@ public class AuthServiceImpl implements AuthService {
 	private final PasswordEncoder encoder;
 
 	@Override
+	@Transactional
 	public boolean login(String username, String password) {
 		if (!userService.userExists(username)) {
 			return false;
@@ -23,6 +25,7 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
+	@Transactional
 	public boolean register(Register register) {
 		if (userService.userExists(register.getUsername())) {
 			return false;
