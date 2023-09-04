@@ -5,11 +5,14 @@ import com.example.diploma.dto.Ads;
 import com.example.diploma.dto.CreateOrUpdateAd;
 import com.example.diploma.dto.ExtendedAd;
 import com.example.diploma.model.Ad;
+import com.example.diploma.model.Image;
 import com.example.diploma.service.AdService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -22,9 +25,10 @@ public class AdController {
 
 	private final AdService adService;
 
+
 	@GetMapping
 	public ResponseEntity<Ads> findAllAds() {
-		return ResponseEntity.ok().body(adService.getAllAds());
+		return ResponseEntity.ok(adService.getAllAds());
 	}
 
 	@GetMapping("/{id}")
@@ -33,12 +37,18 @@ public class AdController {
 		return ad.map(value -> ResponseEntity.ok(Ad.convertAdToExtendedAd(value))).orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
+	@GetMapping(value = "/image/{id}", produces = {MediaType.IMAGE_PNG_VALUE})
+	public ResponseEntity<byte[]> findAdImage(@PathVariable String id) {
+		Optional<Image> image = adService.getImage(Integer.valueOf(id));
+		return image.map(value -> ResponseEntity.ok(value.getImage())).orElseGet(() -> ResponseEntity.notFound().build());
+	}
+
 	@GetMapping("/me")
 	public ResponseEntity<Ads> findAdsByAuthorizedUser() {
 		return ResponseEntity.ok().body(adService.getAllAuthorsAds());
 	}
 
-	@PostMapping
+	@PostMapping("/newAd")
 	public ResponseEntity<AdDTO> addNewAd(@RequestBody AdDTO adDTO) {
 		AdDTO adDTOResponse = adService.createNewAd(adDTO);
 		return adDTOResponse != null ? ResponseEntity.ok(adDTOResponse) : ResponseEntity.badRequest().build();
@@ -51,7 +61,7 @@ public class AdController {
 	}
 
 	@PatchMapping("/{id}/image")
-	public ResponseEntity<Boolean> updateImageOfAd(@PathVariable Integer id, @RequestBody String image) {
+	public ResponseEntity<Boolean> updateImageOfAd(@PathVariable Integer id, @RequestParam MultipartFile image) {
 		return adService.updateImage(id, image) ? ResponseEntity.ok(true) : ResponseEntity.badRequest().body(false);
 	}
 

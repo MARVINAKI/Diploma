@@ -2,10 +2,14 @@ package com.example.diploma.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
+import javax.sql.DataSource;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -19,14 +23,25 @@ public class WebSecurityConfig {
 			"/webjars/**",
 			"/login",
 			"/register",
-			"/ads"
+			"/ads",
+			"/users/image/*",
+			"/ads/image/*"
 	};
+
+	@Bean
+	public JdbcUserDetailsManager jdbcUserDetailsManager(AuthenticationManagerBuilder auth, DataSource dataSource) throws Exception {
+		return auth.jdbcAuthentication()
+				.passwordEncoder(passwordEncoder()).dataSource(dataSource)
+				.usersByUsernameQuery("SELECT username, password, enabled FROM users WHERE username = ?")
+				.authoritiesByUsernameQuery("SELECT username, user_role FROM users WHERE username = ?")
+				.getUserDetailsService();
+	}
+
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
-				.csrf()
-				.disable()
+				.csrf().disable()
 				.authorizeHttpRequests(
 						authorization ->
 								authorization

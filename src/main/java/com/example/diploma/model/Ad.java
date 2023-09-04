@@ -17,8 +17,6 @@ public class Ad {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Integer id;
-	@Column(name = "image")
-	private String image;
 	@Column(name = "price")
 	private Integer price;
 	@Column(name = "title")
@@ -26,6 +24,9 @@ public class Ad {
 	@Column(name = "description")
 	private String description;
 
+	@OneToOne
+	@JoinColumn(name = "image_id", referencedColumnName = "id")
+	private Image image;
 	@ManyToOne
 	@JoinColumn(name = "author_id")
 	private User author;
@@ -67,10 +68,9 @@ public class Ad {
 		return ad;
 	}
 
-	public static Ad convertOnAdUpdate(Ad ad, CreateOrUpdateAd createOrUpdateAd) {
+	public static void convertOnAdUpdate(Ad ad, CreateOrUpdateAd createOrUpdateAd) {
 		ad.setTitle(createOrUpdateAd.getTitle());
 		ad.setPrice(createOrUpdateAd.getPrice());
 		ad.setDescription(createOrUpdateAd.getDescription());
-		return ad;
 	}
 }

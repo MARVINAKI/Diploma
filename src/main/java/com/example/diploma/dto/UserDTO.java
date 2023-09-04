@@ -1,6 +1,7 @@
 package com.example.diploma.dto;
 
 import com.example.diploma.constant.Role;
+import com.example.diploma.model.Image;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -14,7 +15,7 @@ public class UserDTO {
 	private String lastName;
 	private String phone;
 	private Role role;
-	private String image;
+	private Image image;
 	private LocalDateTime registrationDate;
 	private Integer numberOfComments;
 	private Integer numberOfAds;

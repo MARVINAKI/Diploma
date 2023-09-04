@@ -18,10 +18,11 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	@Transactional
 	public boolean login(String username, String password) {
+		User user = userService.getUser(username).orElseThrow();
 		if (!userService.userExists(username)) {
 			return false;
 		}
-		return encoder.matches(password, userService.getUser(username).getPassword());
+		return encoder.matches(password, user.getPassword());
 	}
 
 	@Override

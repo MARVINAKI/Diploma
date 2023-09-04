@@ -1,12 +1,13 @@
 package com.example.diploma.dto;
 
+import com.example.diploma.model.Image;
 import lombok.Data;
 
 @Data
 public class AdDTO {
 
 	private Integer author;
-	private String image;
+	private Image image;
 	private Integer pk;
 	private Integer price;
 	private String title;

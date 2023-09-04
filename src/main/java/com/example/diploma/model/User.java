@@ -35,8 +35,6 @@ public class User implements UserDetails {
 	@Column(name = "user_role")
 	@Enumerated(EnumType.STRING)
 	private Role role;
-	@Column(name = "image")
-	private String image;
 	@Column(name = "registration_date")
 	private LocalDateTime registrationDate = LocalDateTime.now();
 	@Column(name = "username")
@@ -44,6 +42,9 @@ public class User implements UserDetails {
 	@Column(name = "password")
 	private String password;
 
+	@OneToOne
+	@JoinColumn(name = "image_id", referencedColumnName = "id")
+	private Image image;
 	@OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Comment> comments;
 	@OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -76,11 +77,10 @@ public class User implements UserDetails {
 		return user;
 	}
 
-	public static User convertOnUserUpdate(User user, UpdateUser updateUser) {
+	public static void convertOnUserUpdate(User user, UpdateUser updateUser) {
 		user.setFirstName(updateUser.getFirstName());
 		user.setLastName(updateUser.getLastName());
-		user.setPhone(user.getPhone());
-		return user;
+		user.setPhone(updateUser.getPhone());
 	}
 
 	@Override
@@ -91,21 +91,25 @@ public class User implements UserDetails {
 	}
 
 	@Override
+	@Column(name = "account_non_expired")
 	public boolean isAccountNonExpired() {
 		return true;
 	}
 
 	@Override
+	@Column(name = "account_non_locked")
 	public boolean isAccountNonLocked() {
 		return true;
 	}
 
 	@Override
+	@Column(name = "credentials_non_expired")
 	public boolean isCredentialsNonExpired() {
 		return true;
 	}
 
 	@Override
+	@Column(name = "enabled")
 	public boolean isEnabled() {
 		return true;
 	}

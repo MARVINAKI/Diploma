@@ -3,7 +3,11 @@ package com.example.diploma.service;
 import com.example.diploma.dto.NewPassword;
 import com.example.diploma.dto.UpdateUser;
 import com.example.diploma.dto.UserDTO;
+import com.example.diploma.model.Image;
 import com.example.diploma.model.User;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
 
 public interface UserService {
 
@@ -11,7 +15,9 @@ public interface UserService {
 
 	boolean userExists(String email);
 
-	User getUser(String username);
+	Optional<User> getUser(String username);
+
+	Optional<Image> getImage(Integer id);
 
 	UserDTO getAuthorizedUser();
 
@@ -19,5 +25,5 @@ public interface UserService {
 
 	UpdateUser updateUserInfo(UpdateUser updateUser);
 
-	boolean updateImage(String image);
+	boolean updateImage(MultipartFile image);
 }

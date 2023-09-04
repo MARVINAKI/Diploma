@@ -1,5 +1,6 @@
 package com.example.diploma.dto;
 
+import com.example.diploma.model.Image;
 import lombok.Data;
 
 @Data
@@ -10,7 +11,7 @@ public class ExtendedAd {
 	private String authorLastName;
 	private String description;
 	private String email;
-	private String image;
+	private Image image;
 	private String phone;
 	private Integer price;
 	private String title;

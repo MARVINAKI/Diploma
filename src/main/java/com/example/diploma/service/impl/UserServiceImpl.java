@@ -3,15 +3,18 @@ package com.example.diploma.service.impl;
 import com.example.diploma.dto.NewPassword;
 import com.example.diploma.dto.UpdateUser;
 import com.example.diploma.dto.UserDTO;
+import com.example.diploma.model.Image;
 import com.example.diploma.model.User;
 import com.example.diploma.repository.UserRepository;
 import com.example.diploma.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -36,25 +39,29 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public User getUser(String username) {
-		return userRepository.findUserByUsername(username).orElseThrow();
+	public Optional<User> getUser(String username) {
+		return userRepository.findUserByUsername(username);
+	}
+
+	@Override
+	@Transactional
+	public Optional<Image> getImage(Integer id) {
+		return userRepository.findImageById(id);
 	}
 
 	@Override
 	@Transactional
 	public UserDTO getAuthorizedUser() {
-		String username = getUsernameOfAuthorizedUser();
-		User user = userRepository.findUserByUsername(username).orElseThrow();
+		User user = userRepository.findUserByUsername(getUsernameOfAuthorizedUser()).orElseThrow();
 		return User.convertUserToUserDTO(user);
 	}
 
 	@Override
 	@Transactional
 	public boolean updatePassword(NewPassword newPassword) {
-		String username = getUsernameOfAuthorizedUser();
-		User user = userRepository.findUserByUsername(username).orElseThrow();
-		if (encoder.matches(newPassword.getCurrentPassword(), user.getPassword())) {
-			userRepository.updatePassword(username, newPassword.getNewPassword());
+		User currentUser = userRepository.findUserByUsername(getUsernameOfAuthorizedUser()).orElseThrow();
+		if (encoder.matches(newPassword.getCurrentPassword(), currentUser.getPassword())) {
+			currentUser.setPassword(encoder.encode(newPassword.getNewPassword()));
 			return true;
 		}
 		return false;
@@ -63,24 +70,22 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public UpdateUser updateUserInfo(UpdateUser updateUser) {
-		UpdateUser updateUserResponse = new UpdateUser();
-		String username = getUsernameOfAuthorizedUser();
-		Optional<User> user = userRepository.findUserByUsername(username);
-		if (user.isPresent()) {
-			userRepository.save(User.convertOnUserUpdate(user.get(), updateUser));
-			updateUserResponse = updateUser;
-		}
-		return updateUserResponse;
+		User currentUser = userRepository.findUserByUsername(getUsernameOfAuthorizedUser()).orElseThrow();
+		User.convertOnUserUpdate(currentUser, updateUser);
+		return updateUser;
 	}
 
+	@SneakyThrows
 	@Override
 	@Transactional
-	public boolean updateImage(String image) {
+	public boolean updateImage(MultipartFile image) {
 		String username = getUsernameOfAuthorizedUser();
-		Optional<User> user = userRepository.findUserByUsername(username);
-		if (user.isPresent()) {
-			user.get().setImage(image);
-			userRepository.save(user.get());
+		if (!image.isEmpty() && userExists(username)) {
+			User currentUser = userRepository.findUserByUsername(username).orElseThrow();
+			Image imageOfUser = userRepository.findImage(username).orElse(new Image());
+			imageOfUser.setMediaType(image.getContentType());
+			imageOfUser.setImage(image.getBytes());
+			currentUser.setImage(imageOfUser);
 			return true;
 		}
 		return false;
