@@ -1,9 +1,9 @@
 package com.example.diploma.service;
 
-import com.example.diploma.dto.Register;
+import com.example.diploma.dto.RegisterDTO;
 
 public interface AuthService {
 	boolean login(String userName, String password);
 
-	boolean register(Register register);
+	boolean register(RegisterDTO registerDTO);
 }

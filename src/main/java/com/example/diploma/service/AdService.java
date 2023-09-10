@@ -1,10 +1,9 @@
 package com.example.diploma.service;
 
 import com.example.diploma.dto.AdDTO;
-import com.example.diploma.dto.Ads;
-import com.example.diploma.dto.CreateOrUpdateAd;
+import com.example.diploma.dto.AdsDTO;
+import com.example.diploma.dto.CreateOrUpdateAdDTO;
 import com.example.diploma.model.Ad;
-import com.example.diploma.model.Image;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
@@ -13,17 +12,15 @@ public interface AdService {
 
 	boolean adExists(Integer id);
 
-	Ads getAllAds();
+	AdsDTO getAllAds();
 
-	Ads getAllAuthorsAds();
+	AdsDTO getAllAuthorsAds();
 
 	Optional<Ad> getAd(Integer id);
 
-	Optional<Image> getImage(Integer id);
+	AdDTO createAd(CreateOrUpdateAdDTO createOrUpdateAdDTO, MultipartFile image);
 
-	AdDTO createNewAd(AdDTO adDTO);
-
-	AdDTO updateAd(Integer id, CreateOrUpdateAd createOrUpdateAd);
+	AdDTO updateAd(Integer id, CreateOrUpdateAdDTO createOrUpdateAdDTO);
 
 	boolean updateImage(Integer id, MultipartFile image);
 

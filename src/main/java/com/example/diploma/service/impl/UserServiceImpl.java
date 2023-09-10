@@ -1,10 +1,11 @@
 package com.example.diploma.service.impl;
 
-import com.example.diploma.dto.NewPassword;
-import com.example.diploma.dto.UpdateUser;
+import com.example.diploma.dto.NewPasswordDTO;
+import com.example.diploma.dto.UpdateUserDTO;
 import com.example.diploma.dto.UserDTO;
 import com.example.diploma.model.Image;
 import com.example.diploma.model.User;
+import com.example.diploma.repository.ImageRepository;
 import com.example.diploma.repository.UserRepository;
 import com.example.diploma.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +24,15 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
+	private final ImageRepository imageRepository;
 	private final PasswordEncoder encoder;
 
 	@Override
 	@Transactional
 	public void createUser(User user) {
+		Image emptyImage = new Image();
+		imageRepository.saveAndFlush(emptyImage);
+		user.setImage(emptyImage);
 		userRepository.save(user);
 	}
 
@@ -45,12 +50,6 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public Optional<Image> getImage(Integer id) {
-		return userRepository.findImageById(id);
-	}
-
-	@Override
-	@Transactional
 	public UserDTO getAuthorizedUser() {
 		User user = userRepository.findUserByUsername(getUsernameOfAuthorizedUser()).orElseThrow();
 		return User.convertUserToUserDTO(user);
@@ -58,10 +57,10 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public boolean updatePassword(NewPassword newPassword) {
+	public boolean updatePassword(NewPasswordDTO newPasswordDTO) {
 		User currentUser = userRepository.findUserByUsername(getUsernameOfAuthorizedUser()).orElseThrow();
-		if (encoder.matches(newPassword.getCurrentPassword(), currentUser.getPassword())) {
-			currentUser.setPassword(encoder.encode(newPassword.getNewPassword()));
+		if (encoder.matches(newPasswordDTO.getCurrentPassword(), currentUser.getPassword())) {
+			currentUser.setPassword(encoder.encode(newPasswordDTO.getNewPassword()));
 			return true;
 		}
 		return false;
@@ -69,10 +68,10 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public UpdateUser updateUserInfo(UpdateUser updateUser) {
+	public UpdateUserDTO updateUserInfo(UpdateUserDTO updateUserDTO) {
 		User currentUser = userRepository.findUserByUsername(getUsernameOfAuthorizedUser()).orElseThrow();
-		User.convertOnUserUpdate(currentUser, updateUser);
-		return updateUser;
+		User.convertOnUserUpdate(currentUser, updateUserDTO);
+		return updateUserDTO;
 	}
 
 	@SneakyThrows
@@ -80,12 +79,14 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public boolean updateImage(MultipartFile image) {
 		String username = getUsernameOfAuthorizedUser();
-		if (!image.isEmpty() && userExists(username)) {
-			User currentUser = userRepository.findUserByUsername(username).orElseThrow();
-			Image imageOfUser = userRepository.findImage(username).orElse(new Image());
+		User currentUser = userRepository.findUserByUsername(username).orElseThrow();
+		if (!image.isEmpty()) {
+			Image imageOfUser = userRepository.findUserByUsername(username).orElseThrow().getImage();
 			imageOfUser.setMediaType(image.getContentType());
 			imageOfUser.setImage(image.getBytes());
+			imageRepository.saveAndFlush(imageOfUser);
 			currentUser.setImage(imageOfUser);
+			userRepository.saveAndFlush(currentUser);
 			return true;
 		}
 		return false;

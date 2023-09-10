@@ -1,8 +1,8 @@
 package com.example.diploma.model;
 
 import com.example.diploma.dto.AdDTO;
-import com.example.diploma.dto.CreateOrUpdateAd;
-import com.example.diploma.dto.ExtendedAd;
+import com.example.diploma.dto.CreateOrUpdateAdDTO;
+import com.example.diploma.dto.ExtendedAdDTO;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -24,10 +24,10 @@ public class Ad {
 	@Column(name = "description")
 	private String description;
 
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "image_id", referencedColumnName = "id")
 	private Image image;
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "author_id")
 	private User author;
 	@OneToMany(mappedBy = "ad", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -36,7 +36,7 @@ public class Ad {
 	public static AdDTO convertAdToAdDTO(Ad ad) {
 		AdDTO adDTO = new AdDTO();
 		adDTO.setAuthor(ad.getAuthor().getId());
-		adDTO.setImage(ad.getImage());
+		adDTO.setImage("/ads/image/" + ad.getImage().getId());
 		adDTO.setPk(ad.getId());
 		adDTO.setPrice(ad.getPrice());
 		adDTO.setTitle(ad.getTitle());
@@ -44,33 +44,33 @@ public class Ad {
 		return adDTO;
 	}
 
-	public static ExtendedAd convertAdToExtendedAd(Ad ad) {
-		ExtendedAd extendedAd = new ExtendedAd();
-		extendedAd.setPk(ad.getId());
-		extendedAd.setAuthorFirstName(ad.getAuthor().getFirstName());
-		extendedAd.setAuthorLastName(ad.getAuthor().getLastName());
-		extendedAd.setDescription(ad.getDescription());
-		extendedAd.setEmail(ad.getAuthor().getEmail());
-		extendedAd.setImage(ad.getImage());
-		extendedAd.setPhone(ad.getAuthor().getPhone());
-		extendedAd.setPrice(ad.getPrice());
-		extendedAd.setTitle(ad.getTitle());
-		return extendedAd;
+	public static ExtendedAdDTO convertAdToExtendedAd(Ad ad) {
+		ExtendedAdDTO extendedAdDTO = new ExtendedAdDTO();
+		extendedAdDTO.setPk(ad.getId());
+		extendedAdDTO.setAuthorFirstName(ad.getAuthor().getFirstName());
+		extendedAdDTO.setAuthorLastName(ad.getAuthor().getLastName());
+		extendedAdDTO.setDescription(ad.getDescription());
+		extendedAdDTO.setEmail(ad.getAuthor().getEmail());
+		extendedAdDTO.setImage("/ads/image/" + ad.getImage().getId());
+		extendedAdDTO.setPhone(ad.getAuthor().getPhone());
+		extendedAdDTO.setPrice(ad.getPrice());
+		extendedAdDTO.setTitle(ad.getTitle());
+		return extendedAdDTO;
 	}
 
-	public static Ad convertAdDtoToAd(User author, AdDTO adDTO) {
+	public static Ad convertToAdOnCreate(User user, CreateOrUpdateAdDTO createOrUpdateAdDTO, Image image) {
 		Ad ad = new Ad();
-		ad.setImage(adDTO.getImage());
-		ad.setPrice(adDTO.getPrice());
-		ad.setTitle(adDTO.getTitle());
-		ad.setDescription(adDTO.getDescription());
-		ad.setAuthor(author);
+		ad.setAuthor(user);
+		ad.setImage(image);
+		ad.setTitle(createOrUpdateAdDTO.getTitle());
+		ad.setPrice(createOrUpdateAdDTO.getPrice());
+		ad.setDescription(createOrUpdateAdDTO.getDescription());
 		return ad;
 	}
 
-	public static void convertOnAdUpdate(Ad ad, CreateOrUpdateAd createOrUpdateAd) {
-		ad.setTitle(createOrUpdateAd.getTitle());
-		ad.setPrice(createOrUpdateAd.getPrice());
-		ad.setDescription(createOrUpdateAd.getDescription());
+	public static void convertToAdOnUpdate(Ad ad, CreateOrUpdateAdDTO createOrUpdateAdDTO) {
+		ad.setTitle(createOrUpdateAdDTO.getTitle());
+		ad.setPrice(createOrUpdateAdDTO.getPrice());
+		ad.setDescription(createOrUpdateAdDTO.getDescription());
 	}
 }

@@ -1,6 +1,9 @@
 package com.example.diploma.model;
 
 import lombok.Data;
+import lombok.SneakyThrows;
+import org.hibernate.annotations.Type;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 
@@ -16,6 +19,14 @@ public class Image {
 	private String mediaType;
 	@Column(name = "image")
 	@Lob
+	@Type(type = "org.hibernate.type.BinaryType")
 	private byte[] image;
 
+	@SneakyThrows
+	public static Image convertToImageMultiPartFile(MultipartFile multipartFile) {
+		Image image = new Image();
+		image.setMediaType(multipartFile.getContentType());
+		image.setImage(multipartFile.getBytes());
+		return image;
+	}
 }

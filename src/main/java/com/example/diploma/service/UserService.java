@@ -1,9 +1,8 @@
 package com.example.diploma.service;
 
-import com.example.diploma.dto.NewPassword;
-import com.example.diploma.dto.UpdateUser;
+import com.example.diploma.dto.NewPasswordDTO;
+import com.example.diploma.dto.UpdateUserDTO;
 import com.example.diploma.dto.UserDTO;
-import com.example.diploma.model.Image;
 import com.example.diploma.model.User;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,13 +16,11 @@ public interface UserService {
 
 	Optional<User> getUser(String username);
 
-	Optional<Image> getImage(Integer id);
-
 	UserDTO getAuthorizedUser();
 
-	boolean updatePassword(NewPassword newPassword);
+	boolean updatePassword(NewPasswordDTO newPasswordDTO);
 
-	UpdateUser updateUserInfo(UpdateUser updateUser);
+	UpdateUserDTO updateUserInfo(UpdateUserDTO updateUserDTO);
 
 	boolean updateImage(MultipartFile image);
 }

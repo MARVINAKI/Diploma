@@ -1,6 +1,6 @@
 package com.example.diploma.service.impl;
 
-import com.example.diploma.dto.Register;
+import com.example.diploma.dto.RegisterDTO;
 import com.example.diploma.model.User;
 import com.example.diploma.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +27,12 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	@Transactional
-	public boolean register(Register register) {
-		if (userService.userExists(register.getUsername())) {
+	public boolean register(RegisterDTO registerDTO) {
+		if (userService.userExists(registerDTO.getUsername())) {
 			return false;
 		}
-		User user = User.convertRegisterToUser(register);
-		user.setPassword(encoder.encode(register.getPassword()));
+		User user = User.convertRegisterToUser(registerDTO);
+		user.setPassword(encoder.encode(registerDTO.getPassword()));
 		userService.createUser(user);
 		return true;
 	}

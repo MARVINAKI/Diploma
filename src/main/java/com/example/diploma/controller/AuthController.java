@@ -1,7 +1,7 @@
 package com.example.diploma.controller;
 
-import com.example.diploma.dto.Login;
-import com.example.diploma.dto.Register;
+import com.example.diploma.dto.LoginDTO;
+import com.example.diploma.dto.RegisterDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +23,8 @@ public class AuthController {
 
 	@Operation(summary = "Аутентификация пользователя")
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody Login login) {
-		if (authService.login(login.getUsername(), login.getPassword())) {
+	public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
+		if (authService.login(loginDTO.getUsername(), loginDTO.getPassword())) {
 			return ResponseEntity.ok().build();
 		} else {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -33,8 +33,8 @@ public class AuthController {
 
 	@Operation(summary = "Регистрация нового пользователя")
 	@PostMapping("/register")
-	public ResponseEntity<?> register(@RequestBody Register register) {
-		if (authService.register(register)) {
+	public ResponseEntity<?> register(@RequestBody RegisterDTO registerDTO) {
+		if (authService.register(registerDTO)) {
 			return ResponseEntity.status(HttpStatus.CREATED).build();
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

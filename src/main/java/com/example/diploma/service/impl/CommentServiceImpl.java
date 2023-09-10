@@ -1,8 +1,8 @@
 package com.example.diploma.service.impl;
 
 import com.example.diploma.dto.CommentDTO;
-import com.example.diploma.dto.Comments;
-import com.example.diploma.dto.CreateOrUpdateComment;
+import com.example.diploma.dto.CommentsDTO;
+import com.example.diploma.dto.CreateOrUpdateCommentDTO;
 import com.example.diploma.model.Ad;
 import com.example.diploma.model.Comment;
 import com.example.diploma.model.User;
@@ -30,23 +30,23 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	@Transactional
-	public Comments findAllCommentsOfAd(Integer id) {
+	public CommentsDTO findAllCommentsOfAd(Integer id) {
 		List<CommentDTO> commentDTOList = commentRepository.findAll().stream()
 				.filter(comment -> comment.getAd().getId().equals(id))
 				.map(Comment::convertCommentToCommentDTO)
 				.collect(Collectors.toList());
-		return Comments.convertListToComments(commentDTOList);
+		return CommentsDTO.convertListToComments(commentDTOList);
 	}
 
 	@Override
 	@Transactional
-	public CommentDTO createCommentByAd(Integer id, CreateOrUpdateComment createOrUpdateComment) {
+	public CommentDTO createCommentByAd(Integer id, CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
 		CommentDTO commentDTO = new CommentDTO();
 		String username = getUsernameOfAuthorizedUser();
 		Optional<User> author = userRepository.findUserByUsername(username);
 		Optional<Ad> ad = adRepository.findById(id);
 		if (ad.isPresent() && author.isPresent()) {
-			Comment comment = Comment.convertNewCommentToComment(createOrUpdateComment, author.get(), ad.get());
+			Comment comment = Comment.convertNewCommentToComment(createOrUpdateCommentDTO, author.get(), ad.get());
 			commentDTO = Comment.convertCommentToCommentDTO(comment);
 			commentRepository.save(comment);
 		}
@@ -55,11 +55,11 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	@Transactional
-	public CommentDTO updateCommentOfAd(Integer adId, Integer commentId, CreateOrUpdateComment createOrUpdateComment) {
+	public CommentDTO updateCommentOfAd(Integer adId, Integer commentId, CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
 		CommentDTO commentDTO = new CommentDTO();
 		Optional<Comment> comment = commentRepository.findCommentByIdAndAd_Id(commentId, adId);
 		if (comment.isPresent()) {
-			comment.get().setText(createOrUpdateComment.getText());
+			comment.get().setText(createOrUpdateCommentDTO.getText());
 			commentDTO = Comment.convertCommentToCommentDTO(comment.get());
 			commentRepository.save(comment.get());
 		}

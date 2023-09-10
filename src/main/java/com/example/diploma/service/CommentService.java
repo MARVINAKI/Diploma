@@ -1,16 +1,16 @@
 package com.example.diploma.service;
 
 import com.example.diploma.dto.CommentDTO;
-import com.example.diploma.dto.Comments;
-import com.example.diploma.dto.CreateOrUpdateComment;
+import com.example.diploma.dto.CommentsDTO;
+import com.example.diploma.dto.CreateOrUpdateCommentDTO;
 
 public interface CommentService {
 
-	Comments findAllCommentsOfAd(Integer id);
+	CommentsDTO findAllCommentsOfAd(Integer id);
 
-	CommentDTO createCommentByAd(Integer id, CreateOrUpdateComment comment);
+	CommentDTO createCommentByAd(Integer id, CreateOrUpdateCommentDTO comment);
 
-	CommentDTO updateCommentOfAd(Integer adId, Integer commentId, CreateOrUpdateComment createOrUpdateComment);
+	CommentDTO updateCommentOfAd(Integer adId, Integer commentId, CreateOrUpdateCommentDTO createOrUpdateCommentDTO);
 
 	boolean deleteComment(Integer adId, Integer commentId);
 }

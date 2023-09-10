@@ -3,12 +3,9 @@ package com.example.diploma.dto;
 import lombok.Data;
 
 @Data
-public class AdDTO {
+public class CreateOrUpdateAdDTO {
 
-	private Integer author;
-	private String image;
-	private Integer pk;
-	private Integer price;
 	private String title;
+	private Integer price;
 	private String description;
 }

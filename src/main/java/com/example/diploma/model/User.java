@@ -1,24 +1,21 @@
 package com.example.diploma.model;
 
 import com.example.diploma.constant.Role;
-import com.example.diploma.dto.Register;
-import com.example.diploma.dto.UpdateUser;
+import com.example.diploma.dto.RegisterDTO;
+import com.example.diploma.dto.UpdateUserDTO;
 import com.example.diploma.dto.UserDTO;
 import lombok.Data;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Data
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
+@RequiredArgsConstructor
+public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,8 +39,8 @@ public class User implements UserDetails {
 	@Column(name = "password")
 	private String password;
 
-	@OneToOne
-	@JoinColumn(name = "image_id", referencedColumnName = "id")
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "image_id")
 	private Image image;
 	@OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Comment> comments;
@@ -58,60 +55,41 @@ public class User implements UserDetails {
 		userDTO.setLastName(user.getLastName());
 		userDTO.setPhone(user.getPhone());
 		userDTO.setRole(user.getRole());
-		userDTO.setImage(user.getImage());
+		userDTO.setImage("/users/image/" + user.getImage().getId());
 		userDTO.setRegistrationDate(user.getRegistrationDate());
 		userDTO.setNumberOfComments(user.getComments().size());
 		userDTO.setNumberOfAds(user.getAds().size());
 		return userDTO;
 	}
 
-	public static User convertRegisterToUser(Register register) {
+	public static User convertRegisterToUser(RegisterDTO registerDTO) {
 		User user = new User();
-		user.setEmail(register.getUsername());
-		user.setFirstName(register.getFirstName());
-		user.setLastName(register.getLastName());
-		user.setPhone(register.getPhone());
-		user.setRole(register.getRole());
-		user.setUsername(register.getUsername());
-		user.setPassword(register.getPassword());
+		user.setEmail(registerDTO.getUsername());
+		user.setFirstName(registerDTO.getFirstName());
+		user.setLastName(registerDTO.getLastName());
+		user.setPhone(registerDTO.getPhone());
+		user.setRole(registerDTO.getRole());
+		user.setUsername(registerDTO.getUsername());
+		user.setPassword(registerDTO.getPassword());
 		return user;
 	}
 
-	public static void convertOnUserUpdate(User user, UpdateUser updateUser) {
-		user.setFirstName(updateUser.getFirstName());
-		user.setLastName(updateUser.getLastName());
-		user.setPhone(updateUser.getPhone());
+	public static void convertOnUserUpdate(User user, UpdateUserDTO updateUserDTO) {
+		user.setFirstName(updateUserDTO.getFirstName());
+		user.setLastName(updateUserDTO.getLastName());
+		user.setPhone(updateUserDTO.getPhone());
 	}
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-		grantedAuthorities.add(new SimpleGrantedAuthority(this.role.toString()));
-		return grantedAuthorities;
-	}
-
-	@Override
 	@Column(name = "account_non_expired")
-	public boolean isAccountNonExpired() {
-		return true;
-	}
+	public boolean isAccountNonExpired = true;
 
-	@Override
 	@Column(name = "account_non_locked")
-	public boolean isAccountNonLocked() {
-		return true;
-	}
+	private boolean isAccountNonLocked = true;
 
-	@Override
 	@Column(name = "credentials_non_expired")
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
+	public boolean isCredentialsNonExpired = true;
 
-	@Override
 	@Column(name = "enabled")
-	public boolean isEnabled() {
-		return true;
-	}
+	public boolean isEnabled = true;
 }
 

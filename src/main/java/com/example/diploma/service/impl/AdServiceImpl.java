@@ -1,12 +1,13 @@
 package com.example.diploma.service.impl;
 
 import com.example.diploma.dto.AdDTO;
-import com.example.diploma.dto.Ads;
-import com.example.diploma.dto.CreateOrUpdateAd;
+import com.example.diploma.dto.AdsDTO;
+import com.example.diploma.dto.CreateOrUpdateAdDTO;
 import com.example.diploma.model.Ad;
 import com.example.diploma.model.Image;
 import com.example.diploma.model.User;
 import com.example.diploma.repository.AdRepository;
+import com.example.diploma.repository.ImageRepository;
 import com.example.diploma.repository.UserRepository;
 import com.example.diploma.service.AdService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class AdServiceImpl implements AdService {
 
 	private final AdRepository adRepository;
 	private final UserRepository userRepository;
+	private final ImageRepository imageRepository;
 
 	@Override
 	@Transactional
@@ -36,17 +38,17 @@ public class AdServiceImpl implements AdService {
 
 	@Override
 	@Transactional
-	public Ads getAllAds() {
+	public AdsDTO getAllAds() {
 		List<AdDTO> adDTOList = adRepository.findAll().stream().map(Ad::convertAdToAdDTO).collect(Collectors.toList());
-		return Ads.convertListToAds(adDTOList);
+		return AdsDTO.convertListToAds(adDTOList);
 	}
 
 	@Override
 	@Transactional
-	public Ads getAllAuthorsAds() {
+	public AdsDTO getAllAuthorsAds() {
 		User author = userRepository.findUserByUsername(getUsernameOfAuthorizedUser()).orElseThrow();
-		List<AdDTO> adDTOList = adRepository.findAllByAuthor_Id(author.getId()).stream().map(Ad::convertAdToAdDTO).collect(Collectors.toList());
-		return Ads.convertListToAds(adDTOList);
+		List<AdDTO> adDTOList = adRepository.findAllByAuthor(author).stream().map(Ad::convertAdToAdDTO).collect(Collectors.toList());
+		return AdsDTO.convertListToAds(adDTOList);
 	}
 
 	@Override
@@ -56,23 +58,22 @@ public class AdServiceImpl implements AdService {
 	}
 
 	@Override
-	public Optional<Image> getImage(Integer id) {
-		return adRepository.findImageById(id);
+	@Transactional
+	public AdDTO createAd(CreateOrUpdateAdDTO createOrUpdateAdDTO, MultipartFile image) {
+		User user = userRepository.findUserByUsername(getUsernameOfAuthorizedUser()).orElseThrow();
+		Image imageOfAd = Image.convertToImageMultiPartFile(image);
+		imageRepository.saveAndFlush(imageOfAd);
+		Ad ad = Ad.convertToAdOnCreate(user, createOrUpdateAdDTO, imageOfAd);
+		adRepository.save(ad);
+		return Ad.convertAdToAdDTO(ad);
 	}
 
 	@Override
 	@Transactional
-	public AdDTO createNewAd(AdDTO adDTO) {
-		User author = userRepository.findUserByUsername(getUsernameOfAuthorizedUser()).orElseThrow();
-		adRepository.save(Ad.convertAdDtoToAd(author, adDTO));
-		return adDTO;
-	}
-
-	@Override
-	@Transactional
-	public AdDTO updateAd(Integer id, CreateOrUpdateAd createOrUpdateAd) {
+	public AdDTO updateAd(Integer id, CreateOrUpdateAdDTO createOrUpdateAdDTO) {
 		Ad ad = adRepository.findById(id).orElseThrow();
-		Ad.convertOnAdUpdate(ad, createOrUpdateAd);
+		Ad.convertToAdOnUpdate(ad, createOrUpdateAdDTO);
+		adRepository.saveAndFlush(ad);
 		return Ad.convertAdToAdDTO(ad);
 	}
 
@@ -80,12 +81,14 @@ public class AdServiceImpl implements AdService {
 	@Override
 	@Transactional
 	public boolean updateImage(Integer id, MultipartFile image) {
-		if (!image.isEmpty() && adExists(id)) {
+		if (!image.isEmpty()) {
 			Ad ad = adRepository.findById(id).orElseThrow();
-			Image imageOfAd = adRepository.findImage(id).orElse(new Image());
+			Image imageOfAd = adRepository.findById(id).orElseThrow().getImage();
 			imageOfAd.setMediaType(image.getContentType());
 			imageOfAd.setImage(image.getBytes());
+			imageRepository.saveAndFlush(imageOfAd);
 			ad.setImage(imageOfAd);
+			adRepository.saveAndFlush(ad);
 			return true;
 		}
 		return false;
