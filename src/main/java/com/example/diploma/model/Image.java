@@ -23,7 +23,7 @@ public class Image {
 	private byte[] image;
 
 	@SneakyThrows
-	public static Image convertToImageMultiPartFile(MultipartFile multipartFile) {
+	public static Image convertToImageFromMultipartFile(MultipartFile multipartFile) {
 		Image image = new Image();
 		image.setMediaType(multipartFile.getContentType());
 		image.setImage(multipartFile.getBytes());

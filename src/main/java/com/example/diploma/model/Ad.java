@@ -27,7 +27,7 @@ public class Ad {
 	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "image_id", referencedColumnName = "id")
 	private Image image;
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "author_id")
 	private User author;
 	@OneToMany(mappedBy = "ad", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -51,7 +51,7 @@ public class Ad {
 		extendedAdDTO.setAuthorLastName(ad.getAuthor().getLastName());
 		extendedAdDTO.setDescription(ad.getDescription());
 		extendedAdDTO.setEmail(ad.getAuthor().getEmail());
-		extendedAdDTO.setImage("/ads/image/" + ad.getImage().getId());
+		extendedAdDTO.setImage("/ads/" + ad.getImage().getId() + "/image");
 		extendedAdDTO.setPhone(ad.getAuthor().getPhone());
 		extendedAdDTO.setPrice(ad.getPrice());
 		extendedAdDTO.setTitle(ad.getTitle());

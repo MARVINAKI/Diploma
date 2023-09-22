@@ -69,7 +69,7 @@ public class User {
 		user.setLastName(registerDTO.getLastName());
 		user.setPhone(registerDTO.getPhone());
 		user.setRole(registerDTO.getRole());
-		user.setUsername(registerDTO.getUsername());
+		user.setUsername(registerDTO.getUsername().toLowerCase());
 		user.setPassword(registerDTO.getPassword());
 		return user;
 	}

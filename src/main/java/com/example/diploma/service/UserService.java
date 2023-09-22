@@ -16,7 +16,8 @@ public interface UserService {
 
 	Optional<User> getUser(String username);
 
-	UserDTO getAuthorizedUser();
+	//	UserDTO getAuthorizedUser();
+	Optional<User> getAuthorizedUser();
 
 	boolean updatePassword(NewPasswordDTO newPasswordDTO);
 

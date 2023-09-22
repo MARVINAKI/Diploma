@@ -20,6 +20,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Реализация интерфейса {@link CommentService}<p>
+ * Класс сервис {@link CommentServiceImpl} предназначен для управления классом комментарии {@link Comment} и связанными классами<p>
+ */
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
@@ -28,6 +32,13 @@ public class CommentServiceImpl implements CommentService {
 	private final AdRepository adRepository;
 	private final UserRepository userRepository;
 
+	/**
+	 * Метод поиска всех комментариев конкретного объявления<p>
+	 * {@link CommentRepository#findAll()}<p>
+	 *
+	 * @param id идентификационный номер объявления<p>
+	 * @return {@link CommentsDTO} список комментариев<p>
+	 */
 	@Override
 	@Transactional
 	public CommentsDTO findAllCommentsOfAd(Integer id) {
@@ -38,6 +49,16 @@ public class CommentServiceImpl implements CommentService {
 		return CommentsDTO.convertListToComments(commentDTOList);
 	}
 
+	/**
+	 * Метод создания комментария для конкретного объявления с проверкой авторизации<p>
+	 * {@link UserRepository#findUserByUsername(String)}<p>
+	 * {@link AdRepository#findById(Object)}<p>
+	 * {@link CommentRepository#save(Object)}<p>
+	 *
+	 * @param id                       идентификационный номер объявления<p>
+	 * @param createOrUpdateCommentDTO DTO класс {@link CreateOrUpdateCommentDTO} с данными для создания комментария<p>
+	 * @return {@link CommentDTO} созданный комментарий с связанными данными<p>
+	 */
 	@Override
 	@Transactional
 	public CommentDTO createCommentByAd(Integer id, CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
@@ -53,6 +74,16 @@ public class CommentServiceImpl implements CommentService {
 		return commentDTO;
 	}
 
+	/**
+	 * Метод обновления конкретного комментария у определенного объявления<p>
+	 * {@link CommentRepository#findCommentByIdAndAd_Id(Integer, Integer)}<p>
+	 * {@link CommentRepository#save(Object)}<p>
+	 *
+	 * @param adId                     идентификационный номер объявления<p>
+	 * @param commentId                идентификационный номер комментария<p>
+	 * @param createOrUpdateCommentDTO DTO класс {@link CreateOrUpdateCommentDTO} с данными для обновления комментария<p>
+	 * @return {@link CommentDTO} обновленный комментарий с связанными данными<p>
+	 */
 	@Override
 	@Transactional
 	public CommentDTO updateCommentOfAd(Integer adId, Integer commentId, CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
@@ -66,6 +97,15 @@ public class CommentServiceImpl implements CommentService {
 		return commentDTO;
 	}
 
+	/**
+	 * Метод удаления конкретного комментария у определенного объявления<p>
+	 * {@link CommentRepository#findCommentByIdAndAd_Id(Integer, Integer)}<p>
+	 * {@link CommentRepository#deleteById(Object)}<p>
+	 *
+	 * @param adId      идентификационный номер объявления<p>
+	 * @param commentId идентификационный номер комментария<p>
+	 * @return <b>true/false</b>
+	 */
 	@Override
 	@Transactional
 	public boolean deleteComment(Integer adId, Integer commentId) {
@@ -77,6 +117,14 @@ public class CommentServiceImpl implements CommentService {
 		return false;
 	}
 
+	/**
+	 * Проверка авторизации пользователя<p>
+	 * {@link Authentication}<p>
+	 * {@link SecurityContextHolder#getContext()}<p>
+	 *
+	 * @return {@link String} имя авторизованного пользователя<p>
+	 * @throws org.springframework.security.core.AuthenticationException при ошибки в проверке авторизации<p>
+	 */
 	private static String getUsernameOfAuthorizedUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		return authentication.getName();
