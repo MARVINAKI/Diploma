@@ -6,6 +6,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @Data
 @Entity
@@ -31,10 +32,9 @@ public class Comment {
 	public static CommentDTO convertCommentToCommentDTO(Comment comment) {
 		CommentDTO commentDTO = new CommentDTO();
 		commentDTO.setAuthor(comment.getAuthor().getId());
-//		commentDTO.setAuthorImage("/" + comment.getAuthor().getImage().getId() + "/comments/image");
-		commentDTO.setAuthorImage("/users/image/"+comment.getAuthor().getImage().getId());
+		commentDTO.setAuthorImage("/users/image/" + comment.getAuthor().getImage().getId());
 		commentDTO.setAuthorFirstName(comment.getAuthor().getFirstName());
-		commentDTO.setCreatedAt(commentDTO.getCreatedAt());
+		commentDTO.setCreatedAt(comment.getCreatedAt().toInstant(ZoneOffset.ofHours(5)).toEpochMilli());
 		commentDTO.setPk(comment.getId());
 		commentDTO.setText(comment.getText());
 		return commentDTO;
