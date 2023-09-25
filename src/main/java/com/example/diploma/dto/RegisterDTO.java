@@ -1,9 +1,10 @@
 package com.example.diploma.dto;
 
+import com.example.diploma.constant.Role;
 import lombok.Data;
 
 @Data
-public class Register {
+public class RegisterDTO {
 
 	private String username;
 	private String password;
